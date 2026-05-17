@@ -1,44 +1,51 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useRef } from "react";
 import MafiaUncle from "./MafiaUncle";
 import Politician from "./Politician";
 
+// Voice IDs מ-ElevenLabs
+const VOICE_MAFIA = "f8NAZK1ciwrVujah7clz";   // Valerio - איטלקי
+const VOICE_POLITICIAN = "cUOf9X9lJBQIB51APspo"; // הפוליטיקאי
+
+// קאש קליינט - אותו ביטוי לא ייקרא פעמיים לשרת
+const clientAudioCache = new Map<string, string>(); // key -> blob URL
+
 const MAFIA_REACTIONS = {
   bold: [
-    { text: "Ay! Ay! Ay! Questo è un bel tiro!", mood: "happy" as const, sound: "ayyy" },
-    { text: "Madonna mia! Finalmente una scelta coraggiosa!", mood: "smug" as const, sound: "madonna" },
-    { text: "Bravissimo! Così si fa!", mood: "happy" as const, sound: "bravo" },
-    { text: "Magnifico! La famiglia è fiera di te.", mood: "smug" as const, sound: "magnifico" },
+    { text: "Ay! Ay! Ay! Questo è un colpo magnifico!", mood: "happy" as const, speech: "Ay! Ay! Ay! Questo è un colpo magnifico!" },
+    { text: "Madonna mia! Finalmente una scelta coraggiosa!", mood: "smug" as const, speech: "Madonna mia! Finalmente una scelta coraggiosa!" },
+    { text: "Bravissimo! Così si fa, amico mio!", mood: "happy" as const, speech: "Bravissimo! Così si fa, amico mio!" },
+    { text: "Magnifico! La famiglia è fiera di te!", mood: "smug" as const, speech: "Magnifico! La famiglia è fiera di te!" },
   ],
   safe: [
-    { text: "Pareggio?! Che cosa?! Mi spezza il cuore...", mood: "annoyed" as const, sound: "mamma_mia" },
-    { text: "Vigliacco. Mia nonna scommette meglio di te.", mood: "annoyed" as const, sound: "mamma_mia" },
-    { text: "Eh, capisco... ma non mi piace.", mood: "annoyed" as const, sound: "mamma_mia" },
+    { text: "Pareggio?! Che cosa?! Mi spezza il cuore...", mood: "annoyed" as const, speech: "Pareggio?! Che cosa?! Mi spezza il cuore..." },
+    { text: "Vigliacco! Mia nonna scommette meglio di te!", mood: "annoyed" as const, speech: "Vigliacco! Mia nonna scommette meglio di te!" },
+    { text: "Mamma mia... questo non va bene per niente.", mood: "annoyed" as const, speech: "Mamma mia... questo non va bene per niente." },
   ],
   upset: [
-    { text: "Che disastro! Contro la mia squadra?!", mood: "shocked" as const, sound: "che_cosa" },
-    { text: "Fuhgeddaboudit! Sei pazzo?", mood: "annoyed" as const, sound: "che_cosa" },
-    { text: "Guarda cosa hai fatto...", mood: "smug" as const, sound: "mamma_mia" },
+    { text: "Che disastro! Contro la mia squadra?!", mood: "shocked" as const, speech: "Che disastro! Contro la mia squadra?!" },
+    { text: "Sei pazzo?! Fuhgeddaboudit!", mood: "annoyed" as const, speech: "Sei pazzo?! Fuhgeddaboudit!" },
+    { text: "Guarda cosa hai fatto... Madonna mia.", mood: "smug" as const, speech: "Guarda cosa hai fatto... Madonna mia." },
   ],
 };
 
 const POLITICIAN_REACTIONS = {
   bold: [
-    { text: "This bet is TREMENDOUS! Nobody bets like this!", mood: "happy" as const, sound: "tremendous" },
-    { text: "Believe me, this is the greatest bet ever made!", mood: "smug" as const, sound: "tremendous" },
-    { text: "Big league! Big league! What a pick!", mood: "happy" as const, sound: "bigleague" },
-    { text: "People are saying this is a genius bet. I agree.", mood: "smug" as const, sound: "tremendous" },
+    { text: "This bet is TREMENDOUS! Nobody bets like this, nobody!", mood: "happy" as const, speech: "This bet is TREMENDOUS! Nobody bets like this, nobody!" },
+    { text: "Believe me, this is the greatest bet ever made in history!", mood: "smug" as const, speech: "Believe me, this is the greatest bet ever made in history!" },
+    { text: "Big league! Big league pick! A lot of people are saying this!", mood: "happy" as const, speech: "Big league! Big league pick! A lot of people are saying this!" },
+    { text: "Genius bet. People tell me I make great bets. Same energy.", mood: "smug" as const, speech: "Genius bet. People tell me I make great bets. Same energy." },
   ],
   safe: [
-    { text: "SAD! Very sad bet. Disgraceful, frankly.", mood: "annoyed" as const, sound: "sad" },
-    { text: "WEAK! This is the weakest bet I have ever seen.", mood: "annoyed" as const, sound: "sad" },
-    { text: "A draw? Losers pick draws. Are you a loser?", mood: "shocked" as const, sound: "sad" },
+    { text: "SAD! Very sad bet. Disgraceful, frankly.", mood: "annoyed" as const, speech: "SAD! Very sad bet. Disgraceful, frankly." },
+    { text: "WEAK! This is the weakest bet I've ever seen. Believe me.", mood: "annoyed" as const, speech: "WEAK! This is the weakest bet I have ever seen. Believe me." },
+    { text: "A draw? Only losers pick draws. Are you a loser?", mood: "shocked" as const, speech: "A draw? Only losers pick draws. Are you a loser?" },
   ],
   upset: [
-    { text: "WRONG! Completely wrong! A total disaster!", mood: "shocked" as const, sound: "wrong" },
-    { text: "This will not end well. Trust me, I know.", mood: "annoyed" as const, sound: "sad" },
-    { text: "Fake bet! Very fake!", mood: "annoyed" as const, sound: "wrong" },
+    { text: "WRONG! Completely wrong! Total disaster! Embarrassing!", mood: "shocked" as const, speech: "WRONG! Completely wrong! Total disaster! Embarrassing!" },
+    { text: "This will not end well for you. Trust me, I know these things.", mood: "annoyed" as const, speech: "This will not end well for you. Trust me, I know these things." },
+    { text: "Fake bet! Very fake! Low energy pick!", mood: "annoyed" as const, speech: "Fake bet! Very fake! Low energy pick!" },
   ],
 };
 
@@ -56,56 +63,10 @@ function isSoundEnabled(): boolean {
   return localStorage.getItem("toto_sound_enabled") === "1";
 }
 
-function getBestVoice(character: Character): SpeechSynthesisVoice | null {
-  const voices = window.speechSynthesis.getVoices();
-  if (!voices.length) return null;
-  if (character === "mafia") {
-    const italian = voices.find((v) => v.lang.startsWith("it"));
-    if (italian) return italian;
-    const google = voices.find((v) => v.name.includes("Google") && v.lang.startsWith("en"));
-    if (google) return google;
-  }
-  if (character === "politician") {
-    const google = voices.find((v) => v.name.includes("Google") && v.lang === "en-US");
-    if (google) return google;
-    const us = voices.find((v) => v.lang === "en-US");
-    if (us) return us;
-  }
-  return voices[0] || null;
-}
-
-function playReaction(sound: string, character: Character) {
-  if (!isSoundEnabled()) return;
-  if (!window.speechSynthesis) return;
-  window.speechSynthesis.cancel();
-  const phrases: Record<string, string> = {
-    ayyy: "Ay! Ay! Ay!",
-    madonna: "Madonna mia!",
-    bravo: "Bravissimo!",
-    magnifico: "Magnifico! Bellissimo!",
-    mamma_mia: "Mamma mia... che peccato.",
-    che_cosa: "Che cosa?! Sei pazzo?!",
-    tremendous: "Tremendous! This is tremendous, believe me!",
-    bigleague: "Big league! Big league pick!",
-    sad: "Sad! Very sad! Low energy!",
-    wrong: "Wrong! So wrong! Total disaster!",
-  };
-  const text = phrases[sound] || "Ay!";
-  const u = new SpeechSynthesisUtterance(text);
-  if (character === "mafia") {
-    u.rate = 1.1; u.pitch = 1.3; u.volume = 0.85;
-    const voice = getBestVoice("mafia");
-    if (voice) { u.voice = voice; u.lang = voice.lang; }
-  } else {
-    u.rate = 0.82; u.pitch = 0.55; u.volume = 0.9;
-    const voice = getBestVoice("politician");
-    if (voice) { u.voice = voice; u.lang = "en-US"; }
-  }
-  window.speechSynthesis.speak(u);
-}
-
 export default function ReactionBubble({ prediction, character }: { prediction: Prediction; character?: Character }) {
   const [showAnim, setShowAnim] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
 
   const reactionData = useMemo(() => {
     if (!prediction) return null;
@@ -119,10 +80,50 @@ export default function ReactionBubble({ prediction, character }: { prediction: 
 
   if (!reactionData) return null;
 
-  const handleClick = () => {
+  const playAudio = async () => {
+    if (!isSoundEnabled() || loading) return;
+
+    const voiceId = reactionData.character === "mafia" ? VOICE_MAFIA : VOICE_POLITICIAN;
+    const cacheKey = `${voiceId}:${reactionData.speech}`;
+
     setShowAnim(true);
-    playReaction(reactionData.sound, reactionData.character);
     setTimeout(() => setShowAnim(false), 600);
+
+    // בדוק קאש
+    if (clientAudioCache.has(cacheKey)) {
+      const blobUrl = clientAudioCache.get(cacheKey)!;
+      playBlobUrl(blobUrl);
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const res = await fetch("/api/tts", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text: reactionData.speech, voiceId }),
+      });
+
+      if (!res.ok) throw new Error("TTS failed");
+
+      const blob = await res.blob();
+      const blobUrl = URL.createObjectURL(blob);
+      clientAudioCache.set(cacheKey, blobUrl);
+      playBlobUrl(blobUrl);
+    } catch (err) {
+      console.error("Audio error:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const playBlobUrl = (url: string) => {
+    if (audioRef.current) {
+      audioRef.current.pause();
+    }
+    const audio = new Audio(url);
+    audioRef.current = audio;
+    audio.play().catch(console.error);
   };
 
   return (
@@ -136,12 +137,18 @@ export default function ReactionBubble({ prediction, character }: { prediction: 
       </div>
       <div
         className="reaction-bubble cursor-pointer select-none max-w-[220px]"
-        onClick={handleClick}
+        onClick={playAudio}
         role="button"
         title="לחץ לתגובה קולית"
       >
-        <span className="text-xs opacity-60 ml-1">🔊</span>
-        {reactionData.text}
+        {loading ? (
+          <span className="text-xs opacity-60">⏳ טוען קול...</span>
+        ) : (
+          <>
+            <span className="text-xs opacity-60 ml-1">🔊</span>
+            {reactionData.text}
+          </>
+        )}
       </div>
     </div>
   );

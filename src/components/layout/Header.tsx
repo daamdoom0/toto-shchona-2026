@@ -28,8 +28,9 @@ export default async function Header() {
 
           {profile && (
             <nav className="flex items-center gap-2 flex-wrap">
-              <Link href="/" className="btn btn-secondary text-sm py-1.5 px-3">ההימורים שלי</Link>
+              <Link href="/" className="btn btn-secondary text-sm py-1.5 px-3">🎯 הימורים</Link>
               <Link href="/leaderboard" className="btn btn-gold text-sm py-1.5 px-3">🏆 לוח</Link>
+              <Link href="/chat" className="btn btn-secondary text-sm py-1.5 px-3">💬 צ׳אט</Link>
               <Link href="/rules" className="btn btn-secondary text-sm py-1.5 px-3">📋 הוראות</Link>
               {profile.is_admin && (
                 <Link href="/admin" className="btn btn-danger text-sm py-1.5 px-3">⚙️ אדמין</Link>
