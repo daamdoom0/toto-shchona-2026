@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import SoundButton from "@/components/layout/SoundButton";
 
 export const metadata: Metadata = {
   title: "טוטו מונדיאל 2026 🏆",
@@ -9,7 +10,10 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="he" dir="rtl">
-      <body>{children}</body>
+      <body>
+        <SoundButton />
+        {children}
+      </body>
     </html>
   );
 }

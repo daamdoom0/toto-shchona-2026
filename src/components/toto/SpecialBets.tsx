@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { ALL_TEAMS_LIST } from "@/lib/data/teams";
+import { PLAYERS } from "@/lib/data/players";
 import { saveSpecialBetAction } from "@/actions/bets";
 
 interface Props {
@@ -12,13 +13,7 @@ interface Props {
   locked: boolean;
 }
 
-export default function SpecialBets({
-  championBet,
-  topScorerBet,
-  championResult,
-  topScorerResult,
-  locked,
-}: Props) {
+export default function SpecialBets({ championBet, topScorerBet, championResult, topScorerResult, locked }: Props) {
   const [champion, setChampion] = useState(championBet ?? "");
   const [scorer, setScorer] = useState(topScorerBet ?? "");
   const [saving, startTransition] = useTransition();
@@ -35,12 +30,8 @@ export default function SpecialBets({
     });
   };
 
-  const championStatus = championResult
-    ? champion === championResult ? "correct" : "wrong"
-    : null;
-  const scorerStatus = topScorerResult
-    ? scorer.trim().toLowerCase() === topScorerResult.trim().toLowerCase() ? "correct" : "wrong"
-    : null;
+  const championStatus = championResult ? (champion === championResult ? "correct" : "wrong") : null;
+  const scorerStatus = topScorerResult ? (scorer.trim().toLowerCase() === topScorerResult.trim().toLowerCase() ? "correct" : "wrong") : null;
 
   return (
     <section className="toto-card mb-8 relative">
@@ -62,7 +53,7 @@ export default function SpecialBets({
             🥇 אלופת המונדיאל
             {championResult && (
               <span className="mr-2 text-sm">
-                | תוצאה אמיתית: <b>{championResult}</b>
+                | תוצאה: <b>{championResult}</b>
                 {championStatus === "correct" && <span className="text-toto-green"> ✓ פגעת!</span>}
                 {championStatus === "wrong" && <span className="text-usa-red"> ✗ פספסת</span>}
               </span>
@@ -71,17 +62,12 @@ export default function SpecialBets({
           <select
             value={champion}
             disabled={locked || saving}
-            onChange={(e) => {
-              setChampion(e.target.value);
-              save("champion", e.target.value);
-            }}
+            onChange={(e) => { setChampion(e.target.value); save("champion", e.target.value); }}
             className={`input ${championStatus === "correct" ? "bg-green-50 border-toto-green" : ""} ${championStatus === "wrong" ? "bg-red-50 border-usa-red" : ""}`}
           >
             <option value="">— בחר נבחרת —</option>
             {ALL_TEAMS_LIST.map((t) => (
-              <option key={t.code} value={t.code}>
-                {t.flag} {t.name_he}
-              </option>
+              <option key={t.code} value={t.code}>{t.flag} {t.name_he}</option>
             ))}
           </select>
         </div>
@@ -92,29 +78,27 @@ export default function SpecialBets({
             ⚽ מלך השערים של הטורניר
             {topScorerResult && (
               <span className="mr-2 text-sm">
-                | תוצאה אמיתית: <b>{topScorerResult}</b>
+                | תוצאה: <b>{topScorerResult}</b>
                 {scorerStatus === "correct" && <span className="text-toto-green"> ✓ פגעת!</span>}
                 {scorerStatus === "wrong" && <span className="text-usa-red"> ✗ פספסת</span>}
               </span>
             )}
           </label>
-          <input
-            type="text"
+          <select
             value={scorer}
             disabled={locked || saving}
-            onChange={(e) => setScorer(e.target.value)}
-            onBlur={() => save("top_scorer", scorer)}
-            placeholder="לדוגמה: ארלינג הולנד"
+            onChange={(e) => { setScorer(e.target.value); save("top_scorer", e.target.value); }}
             className={`input ${scorerStatus === "correct" ? "bg-green-50 border-toto-green" : ""} ${scorerStatus === "wrong" ? "bg-red-50 border-usa-red" : ""}`}
-          />
-          <p className="text-xs opacity-60 mt-1 font-mono">
-            כתוב שם השחקן. ההשוואה תתבצע לפי טקסט (case-insensitive). השם לא משתנה אחרי שמירה - דייק.
-          </p>
+          >
+            <option value="">— בחר שחקן —</option>
+            {PLAYERS.map((p) => (
+              <option key={p} value={p}>{p}</option>
+            ))}
+          </select>
+          <p className="text-xs opacity-60 mt-1 font-mono">~130 שחקנים בולטים מכל 48 הנבחרות</p>
         </div>
 
-        {msg && (
-          <div className="text-sm font-bold text-toto-green">{msg}</div>
-        )}
+        {msg && <div className="text-sm font-bold text-toto-green">{msg}</div>}
       </div>
     </section>
   );
