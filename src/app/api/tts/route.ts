@@ -1,12 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 
-// קאש בזיכרון השרת - מונע קריאות כפולות לאותה ביטוי
-const audioCache = new Map<string, Buffer>();
+const audioCache = new Map<string, Uint8Array>();
 
 export async function POST(req: NextRequest) {
   try {
     const { text, voiceId } = await req.json();
-
     if (!text || !voiceId) {
       return NextResponse.json({ error: "Missing text or voiceId" }, { status: 400 });
     }
@@ -52,14 +50,13 @@ export async function POST(req: NextRequest) {
     }
 
     const arrayBuffer = await response.arrayBuffer();
-    const buffer = Buffer.from(arrayBuffer);
+    const uint8 = new Uint8Array(arrayBuffer);
 
-    // שמור בקאש (מקסימום 200 ביטויים)
     if (audioCache.size < 200) {
-      audioCache.set(cacheKey, buffer);
+      audioCache.set(cacheKey, uint8);
     }
 
-    return new NextResponse(buffer, {
+    return new NextResponse(uint8, {
       headers: {
         "Content-Type": "audio/mpeg",
         "Cache-Control": "public, max-age=86400",
