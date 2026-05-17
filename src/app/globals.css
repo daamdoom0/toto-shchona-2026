@@ -1,0 +1,300 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url("https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;700;800;900&family=Suez+One&family=Bebas+Neue&family=Space+Mono:wght@400;700&display=swap");
+
+:root {
+  --toto-green: #005a3c;
+  --toto-green-dark: #003d27;
+  --toto-paper: #f5f1e5;
+  --toto-ink: #1a1a1a;
+  --usa-red: #bf0a30;
+  --usa-blue: #002868;
+  --usa-gold: #ffb81c;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  background-color: var(--toto-paper);
+  color: var(--toto-ink);
+  font-family: "Heebo", system-ui, sans-serif;
+  direction: rtl;
+  background-image:
+    radial-gradient(circle at 25% 30%, rgba(0, 0, 0, 0.018) 1px, transparent 1px),
+    radial-gradient(circle at 75% 75%, rgba(0, 0, 0, 0.018) 1px, transparent 1px),
+    repeating-linear-gradient(45deg, transparent 0, transparent 20px, rgba(0, 90, 60, 0.025) 20px, rgba(0, 90, 60, 0.025) 21px);
+  background-size: 30px 30px, 30px 30px, 100% 100%;
+  min-height: 100vh;
+}
+
+/* Star-spangled accent strip used at top of pages */
+.mundial-flag-strip {
+  height: 6px;
+  background: repeating-linear-gradient(
+    90deg,
+    var(--usa-red) 0,
+    var(--usa-red) 40px,
+    #fff 40px,
+    #fff 80px,
+    var(--usa-blue) 80px,
+    var(--usa-blue) 120px,
+    var(--usa-gold) 120px,
+    var(--usa-gold) 160px
+  );
+}
+
+/* Classic toto card */
+.toto-card {
+  background: #fff;
+  border: 3px solid var(--toto-green);
+  border-radius: 4px;
+  box-shadow:
+    4px 4px 0 var(--toto-green-dark),
+    inset 0 0 0 1px rgba(0, 0, 0, 0.05);
+  position: relative;
+}
+
+.toto-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, var(--toto-green) 0%, var(--toto-green) 50%, var(--usa-gold) 50%, var(--usa-gold) 100%);
+}
+
+/* 1/X/2 bet cells - the heart of toto */
+.bet-cell {
+  width: 56px;
+  height: 56px;
+  border: 2px solid var(--toto-ink);
+  background: #fff;
+  font-family: "Suez One", serif;
+  font-size: 24px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  position: relative;
+  user-select: none;
+}
+
+.bet-cell:hover:not(.bet-cell-locked) {
+  background: #fffdf2;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 0 var(--toto-ink);
+}
+
+.bet-cell-selected {
+  background: var(--toto-green);
+  color: var(--usa-gold);
+  border-color: var(--toto-green-dark);
+}
+
+.bet-cell-correct {
+  background: #c8f7c5;
+  color: var(--toto-green-dark);
+  border-color: var(--toto-green-dark);
+}
+
+.bet-cell-wrong {
+  background: #fadcdc;
+  color: var(--usa-red);
+  border-color: var(--usa-red);
+}
+
+.bet-cell-locked {
+  cursor: not-allowed;
+  opacity: 0.95;
+}
+
+/* Stamp/ink-X selected indicator */
+.bet-cell-selected::after {
+  content: "";
+  position: absolute;
+  inset: 4px;
+  background-image:
+    linear-gradient(45deg, transparent 45%, var(--usa-gold) 45%, var(--usa-gold) 55%, transparent 55%),
+    linear-gradient(-45deg, transparent 45%, var(--usa-gold) 45%, var(--usa-gold) 55%, transparent 55%);
+  opacity: 0.35;
+}
+
+/* Header chip showing stage */
+.stage-chip {
+  display: inline-block;
+  padding: 4px 12px;
+  font-family: "Bebas Neue", sans-serif;
+  font-size: 14px;
+  letter-spacing: 0.1em;
+  background: var(--toto-ink);
+  color: var(--usa-gold);
+  border: 2px solid var(--toto-ink);
+  transform: rotate(-1deg);
+  box-shadow: 2px 2px 0 var(--toto-green);
+}
+
+/* Locked stamp */
+.locked-stamp {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  font-family: "Bebas Neue", sans-serif;
+  font-size: 18px;
+  color: var(--usa-red);
+  border: 3px solid var(--usa-red);
+  padding: 4px 12px;
+  letter-spacing: 0.15em;
+  transform: rotate(-8deg);
+  opacity: 0.7;
+  pointer-events: none;
+  background: rgba(255, 255, 255, 0.6);
+}
+
+/* Group letter big block */
+.group-letter-block {
+  font-family: "Suez One", serif;
+  font-size: 56px;
+  line-height: 1;
+  color: var(--toto-paper);
+  background: var(--toto-green);
+  padding: 12px 24px;
+  display: inline-block;
+  border: 4px solid var(--toto-ink);
+  box-shadow: 4px 4px 0 var(--usa-gold);
+  letter-spacing: 0.02em;
+}
+
+/* Reaction bubble */
+.reaction-bubble {
+  background: #fff;
+  border: 2.5px solid var(--toto-ink);
+  border-radius: 14px;
+  padding: 8px 14px;
+  position: relative;
+  font-weight: 700;
+  box-shadow: 3px 3px 0 var(--toto-ink);
+  font-size: 14px;
+}
+
+.reaction-bubble::after {
+  content: "";
+  position: absolute;
+  bottom: -10px;
+  right: 24px;
+  width: 0;
+  height: 0;
+  border-left: 8px solid transparent;
+  border-right: 8px solid transparent;
+  border-top: 10px solid #fff;
+  filter: drop-shadow(0 2px 0 var(--toto-ink));
+}
+
+/* Button base */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  font-family: "Suez One", serif;
+  font-size: 16px;
+  background: var(--toto-green);
+  color: var(--toto-paper);
+  border: 3px solid var(--toto-ink);
+  cursor: pointer;
+  transition: transform 0.1s, box-shadow 0.1s;
+  box-shadow: 3px 3px 0 var(--toto-ink);
+}
+
+.btn:hover {
+  transform: translate(-1px, -1px);
+  box-shadow: 4px 4px 0 var(--toto-ink);
+}
+
+.btn:active {
+  transform: translate(2px, 2px);
+  box-shadow: 1px 1px 0 var(--toto-ink);
+}
+
+.btn-secondary {
+  background: var(--toto-paper);
+  color: var(--toto-ink);
+}
+
+.btn-danger {
+  background: var(--usa-red);
+  color: #fff;
+}
+
+.btn-gold {
+  background: var(--usa-gold);
+  color: var(--toto-ink);
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none !important;
+  box-shadow: 3px 3px 0 var(--toto-ink) !important;
+}
+
+/* Form input */
+.input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 2px solid var(--toto-ink);
+  background: #fff;
+  font-family: "Heebo", sans-serif;
+  font-size: 16px;
+  box-shadow: inset 2px 2px 0 rgba(0, 0, 0, 0.05);
+}
+
+.input:focus {
+  outline: none;
+  border-color: var(--toto-green);
+  box-shadow: inset 2px 2px 0 rgba(0, 90, 60, 0.1), 0 0 0 3px var(--usa-gold);
+}
+
+/* Scoreboard table */
+table.leaderboard {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  background: #fff;
+  border: 3px solid var(--toto-ink);
+  box-shadow: 4px 4px 0 var(--toto-green);
+}
+
+table.leaderboard th {
+  background: var(--toto-green);
+  color: var(--usa-gold);
+  font-family: "Suez One", serif;
+  padding: 10px;
+  border-bottom: 3px solid var(--toto-ink);
+  text-align: right;
+}
+
+table.leaderboard td {
+  padding: 10px;
+  border-bottom: 1px solid #ddd;
+  font-weight: 600;
+}
+
+table.leaderboard tbody tr:nth-child(odd) {
+  background: #fafaf3;
+}
+
+table.leaderboard tbody tr:first-child td {
+  background: var(--usa-gold);
+  font-size: 18px;
+}
+
+@layer utilities {
+  .text-shadow-stamp {
+    text-shadow: 2px 2px 0 var(--toto-ink);
+  }
+}
