@@ -13,20 +13,20 @@ const clientAudioCache = new Map<string, string>(); // key -> blob URL
 
 const MAFIA_REACTIONS = {
   bold: [
-    { text: "Ay! Ay! Ay! Questo è un colpo magnifico!", mood: "happy" as const, speech: "Ay! Ay! Ay! Questo è un colpo magnifico!" },
-    { text: "Madonna mia! Finalmente una scelta coraggiosa!", mood: "smug" as const, speech: "Madonna mia! Finalmente una scelta coraggiosa!" },
-    { text: "Bravissimo! Così si fa, amico mio!", mood: "happy" as const, speech: "Bravissimo! Così si fa, amico mio!" },
-    { text: "Magnifico! La famiglia è fiera di te!", mood: "smug" as const, speech: "Magnifico! La famiglia è fiera di te!" },
+    { text: "Ay! Now THAT is how you make a bet!", mood: "happy" as const, speech: "Ay! Now THAT is how you make a bet!" },
+    { text: "Fuhgeddaboudit! Beautiful pick, beautiful!", mood: "smug" as const, speech: "Fuhgeddaboudit! Beautiful pick, beautiful!" },
+    { text: "Ay ay ay! You make the family proud!", mood: "happy" as const, speech: "Ay ay ay! You make the family proud!" },
+    { text: "Now THAT'S a bet! You got good taste, I like you.", mood: "smug" as const, speech: "Now THAT'S a bet! You got good taste, I like you." },
   ],
   safe: [
-    { text: "Pareggio?! Che cosa?! Mi spezza il cuore...", mood: "annoyed" as const, speech: "Pareggio?! Che cosa?! Mi spezza il cuore..." },
-    { text: "Vigliacco! Mia nonna scommette meglio di te!", mood: "annoyed" as const, speech: "Vigliacco! Mia nonna scommette meglio di te!" },
-    { text: "Mamma mia... questo non va bene per niente.", mood: "annoyed" as const, speech: "Mamma mia... questo non va bene per niente." },
+    { text: "A DRAW?! You breakin' my heart over here!", mood: "annoyed" as const, speech: "A DRAW?! You breakin' my heart over here!" },
+    { text: "What is this?! My grandmother bets better than you!", mood: "annoyed" as const, speech: "What is this?! My grandmother bets better than you!" },
+    { text: "Ay... you're killin' me. You're KILLIN' me.", mood: "annoyed" as const, speech: "Ay... you're killin' me. You're KILLIN' me." },
   ],
   upset: [
-    { text: "Che disastro! Contro la mia squadra?!", mood: "shocked" as const, speech: "Che disastro! Contro la mia squadra?!" },
-    { text: "Sei pazzo?! Fuhgeddaboudit!", mood: "annoyed" as const, speech: "Sei pazzo?! Fuhgeddaboudit!" },
-    { text: "Guarda cosa hai fatto... Madonna mia.", mood: "smug" as const, speech: "Guarda cosa hai fatto... Madonna mia." },
+    { text: "AGAINST my team?! You got a death wish?!", mood: "shocked" as const, speech: "AGAINST my team?! You got a death wish?!" },
+    { text: "Fuhgeddaboudit! You're dead to me. DEAD.", mood: "annoyed" as const, speech: "Fuhgeddaboudit! You're dead to me. DEAD." },
+    { text: "I'm gonna pretend I didn't see that...", mood: "smug" as const, speech: "I'm gonna pretend I didn't see that..." },
   ],
 };
 
