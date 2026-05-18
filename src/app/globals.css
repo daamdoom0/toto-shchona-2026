@@ -298,3 +298,12 @@ table.leaderboard tbody tr:first-child td {
     text-shadow: 2px 2px 0 var(--toto-ink);
   }
 }
+
+/* Mobile responsive - תאי הימור קטנים יותר בפלאפון */
+@media (max-width: 640px) {
+  .bet-cell {
+    width: 42px;
+    height: 42px;
+    font-size: 20px;
+  }
+}
