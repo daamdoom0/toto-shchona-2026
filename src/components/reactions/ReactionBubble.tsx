@@ -4,26 +4,29 @@ import { useState, useMemo, useRef } from "react";
 import MafiaUncle from "./MafiaUncle";
 import Politician from "./Politician";
 
-const VOICE_MAFIA = "f8NAZK1ciwrVujah7clz";
-const VOICE_POLITICIAN = "cUOf9X9lJBQIB51APspo";
-const clientAudioCache = new Map<string, string>();
+// Voice IDs מ-ElevenLabs
+const VOICE_MAFIA = "f8NAZK1ciwrVujah7clz";   // Valerio - איטלקי
+const VOICE_POLITICIAN = "cUOf9X9lJBQIB51APspo"; // הפוליטיקאי
+
+// קאש קליינט - אותו ביטוי לא ייקרא פעמיים לשרת
+const clientAudioCache = new Map<string, string>(); // key -> blob URL
 
 const MAFIA_REACTIONS = {
   bold: [
-    { text: "Ay! Now THAT is how you make a bet!", mood: "happy" as const, speech: "Ay! Now THAT is how you make a bet!" },
-    { text: "Fuhgeddaboudit! Beautiful pick, beautiful!", mood: "smug" as const, speech: "Fuhgeddaboudit! Beautiful pick, beautiful!" },
-    { text: "Ay ay ay! You make the family proud!", mood: "happy" as const, speech: "Ay ay ay! You make the family proud!" },
-    { text: "Now THAT'S a bet! You got good taste, I like you.", mood: "smug" as const, speech: "Now THAT'S a bet! You got good taste, I like you." },
+    { text: "Ay! Ay! Ay! Questo è un colpo magnifico!", mood: "happy" as const, speech: "Ay! Ay! Ay! Questo è un colpo magnifico!" },
+    { text: "Madonna mia! Finalmente una scelta coraggiosa!", mood: "smug" as const, speech: "Madonna mia! Finalmente una scelta coraggiosa!" },
+    { text: "Bravissimo! Così si fa, amico mio!", mood: "happy" as const, speech: "Bravissimo! Così si fa, amico mio!" },
+    { text: "Magnifico! La famiglia è fiera di te!", mood: "smug" as const, speech: "Magnifico! La famiglia è fiera di te!" },
   ],
   safe: [
-    { text: "A DRAW?! You breakin' my heart over here!", mood: "annoyed" as const, speech: "A DRAW?! You breakin' my heart over here!" },
-    { text: "What is this?! My grandmother bets better than you!", mood: "annoyed" as const, speech: "What is this?! My grandmother bets better than you!" },
-    { text: "Ay... you're killin' me. You're KILLIN' me.", mood: "annoyed" as const, speech: "Ay... you're killin' me. You're KILLIN' me." },
+    { text: "Pareggio?! Che cosa?! Mi spezza il cuore...", mood: "annoyed" as const, speech: "Pareggio?! Che cosa?! Mi spezza il cuore..." },
+    { text: "Vigliacco! Mia nonna scommette meglio di te!", mood: "annoyed" as const, speech: "Vigliacco! Mia nonna scommette meglio di te!" },
+    { text: "Mamma mia... questo non va bene per niente.", mood: "annoyed" as const, speech: "Mamma mia... questo non va bene per niente." },
   ],
   upset: [
-    { text: "AGAINST my team?! You got a death wish?!", mood: "shocked" as const, speech: "AGAINST my team?! You got a death wish?!" },
-    { text: "Fuhgeddaboudit! You're dead to me. DEAD.", mood: "annoyed" as const, speech: "Fuhgeddaboudit! You're dead to me. DEAD." },
-    { text: "I'm gonna pretend I didn't see that...", mood: "smug" as const, speech: "I'm gonna pretend I didn't see that..." },
+    { text: "Che disastro! Contro la mia squadra?!", mood: "shocked" as const, speech: "Che disastro! Contro la mia squadra?!" },
+    { text: "Sei pazzo?! Fuhgeddaboudit!", mood: "annoyed" as const, speech: "Sei pazzo?! Fuhgeddaboudit!" },
+    { text: "Guarda cosa hai fatto... Madonna mia.", mood: "smug" as const, speech: "Guarda cosa hai fatto... Madonna mia." },
   ],
 };
 
@@ -79,16 +82,20 @@ export default function ReactionBubble({ prediction, character }: { prediction: 
 
   const playAudio = async () => {
     if (!isSoundEnabled() || loading) return;
+
     const voiceId = reactionData.character === "mafia" ? VOICE_MAFIA : VOICE_POLITICIAN;
     const cacheKey = `${voiceId}:${reactionData.speech}`;
+
     setShowAnim(true);
     setTimeout(() => setShowAnim(false), 600);
+
+    // בדוק קאש
     if (clientAudioCache.has(cacheKey)) {
-      const audio = new Audio(clientAudioCache.get(cacheKey)!);
-      audioRef.current = audio;
-      audio.play().catch(console.error);
+      const blobUrl = clientAudioCache.get(cacheKey)!;
+      playBlobUrl(blobUrl);
       return;
     }
+
     setLoading(true);
     try {
       const res = await fetch("/api/tts", {
@@ -96,18 +103,27 @@ export default function ReactionBubble({ prediction, character }: { prediction: 
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ text: reactionData.speech, voiceId }),
       });
+
       if (!res.ok) throw new Error("TTS failed");
+
       const blob = await res.blob();
       const blobUrl = URL.createObjectURL(blob);
       clientAudioCache.set(cacheKey, blobUrl);
-      const audio = new Audio(blobUrl);
-      audioRef.current = audio;
-      audio.play().catch(console.error);
+      playBlobUrl(blobUrl);
     } catch (err) {
       console.error("Audio error:", err);
     } finally {
       setLoading(false);
     }
+  };
+
+  const playBlobUrl = (url: string) => {
+    if (audioRef.current) {
+      audioRef.current.pause();
+    }
+    const audio = new Audio(url);
+    audioRef.current = audio;
+    audio.play().catch(console.error);
   };
 
   return (
@@ -119,8 +135,20 @@ export default function ReactionBubble({ prediction, character }: { prediction: 
           <Politician mood={reactionData.mood} size={60} />
         )}
       </div>
-      <div className="reaction-bubble cursor-pointer select-none max-w-[220px]" onClick={playAudio} role="button">
-        {loading ? <span className="text-xs opacity-60">⏳ טוען קול...</span> : <><span className="text-xs opacity-60 ml-1">🔊</span>{reactionData.text}</>}
+      <div
+        className="reaction-bubble cursor-pointer select-none max-w-[220px]"
+        onClick={playAudio}
+        role="button"
+        title="לחץ לתגובה קולית"
+      >
+        {loading ? (
+          <span className="text-xs opacity-60">⏳ טוען קול...</span>
+        ) : (
+          <>
+            <span className="text-xs opacity-60 ml-1">🔊</span>
+            {reactionData.text}
+          </>
+        )}
       </div>
     </div>
   );

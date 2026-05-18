@@ -2,308 +2,581 @@
 @tailwind components;
 @tailwind utilities;
 
-@import url("https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;700;800;900&family=Suez+One&family=Bebas+Neue&family=Space+Mono:wght@400;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;600;700;800;900&family=Suez+One&family=Bebas+Neue&family=Space+Mono:wght@400;700&family=Playfair+Display:wght@600;700;900&display=swap");
 
+/* ============================================================
+   PREMIUM DESIGN TOKENS
+   ============================================================ */
 :root {
-  --toto-green: #005a3c;
-  --toto-green-dark: #003d27;
-  --toto-paper: #f5f1e5;
-  --toto-ink: #1a1a1a;
-  --usa-red: #bf0a30;
-  --usa-blue: #002868;
-  --usa-gold: #ffb81c;
+  --green-900: #001a0e;
+  --green-800: #003320;
+  --green-700: #004830;
+  --green-600: #005a3c;
+  --green-500: #007a52;
+  --green-400: #00a870;
+  --green-100: #c8f5e4;
+
+  --gold-dark: #a07c1a;
+  --gold: #c9a84c;
+  --gold-light: #f0c96a;
+  --gold-bright: #ffdb6e;
+
+  --red: #bf0a30;
+  --red-dark: #8a0020;
+  --navy: #002868;
+
+  --paper: #f7f3e9;
+  --paper-dark: #ede8db;
+  --ink: #0f0f0f;
+  --ink-light: #2a2a2a;
+  --muted: #6b6b6b;
+
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.05);
+  --shadow-md: 0 4px 6px rgba(0,0,0,0.07), 0 2px 4px rgba(0,0,0,0.06);
+  --shadow-lg: 0 10px 15px rgba(0,0,0,0.08), 0 4px 6px rgba(0,0,0,0.05);
+  --shadow-card: 0 2px 0 var(--green-700), 0 4px 12px rgba(0,90,60,0.15);
+  --shadow-card-hover: 0 3px 0 var(--green-700), 0 8px 24px rgba(0,90,60,0.2);
+  --radius: 6px;
+  --radius-lg: 10px;
 }
 
-html,
-body {
+/* ============================================================
+   BASE
+   ============================================================ */
+*, *::before, *::after { box-sizing: border-box; }
+
+html, body {
   margin: 0;
   padding: 0;
-  background-color: var(--toto-paper);
-  color: var(--toto-ink);
   font-family: "Heebo", system-ui, sans-serif;
+  color: var(--ink);
   direction: rtl;
-  background-image:
-    radial-gradient(circle at 25% 30%, rgba(0, 0, 0, 0.018) 1px, transparent 1px),
-    radial-gradient(circle at 75% 75%, rgba(0, 0, 0, 0.018) 1px, transparent 1px),
-    repeating-linear-gradient(45deg, transparent 0, transparent 20px, rgba(0, 90, 60, 0.025) 20px, rgba(0, 90, 60, 0.025) 21px);
-  background-size: 30px 30px, 30px 30px, 100% 100%;
   min-height: 100vh;
+  background-color: var(--paper);
+  background-image:
+    radial-gradient(ellipse at 0% 0%, rgba(0,90,60,0.06) 0%, transparent 50%),
+    radial-gradient(ellipse at 100% 100%, rgba(201,168,76,0.06) 0%, transparent 50%),
+    url("data:image/svg+xml,%3Csvg width='40' height='40' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='1' cy='1' r='0.8' fill='rgba(0,90,60,0.06)'/%3E%3C/svg%3E");
+  background-size: 100% 100%, 100% 100%, 40px 40px;
 }
 
-/* Star-spangled accent strip used at top of pages */
+/* ============================================================
+   TYPOGRAPHY
+   ============================================================ */
+.font-display { font-family: "Suez One", serif; }
+.font-serif   { font-family: "Playfair Display", Georgia, serif; }
+.font-stamp   { font-family: "Bebas Neue", sans-serif; }
+.font-mono    { font-family: "Space Mono", monospace; }
+
+/* ============================================================
+   MONDIAL FLAG STRIP
+   ============================================================ */
 .mundial-flag-strip {
-  height: 6px;
-  background: repeating-linear-gradient(
-    90deg,
-    var(--usa-red) 0,
-    var(--usa-red) 40px,
-    #fff 40px,
-    #fff 80px,
-    var(--usa-blue) 80px,
-    var(--usa-blue) 120px,
-    var(--usa-gold) 120px,
-    var(--usa-gold) 160px
+  height: 5px;
+  background: linear-gradient(90deg,
+    var(--green-600) 0%, var(--green-600) 33%,
+    var(--gold) 33%, var(--gold) 50%,
+    var(--navy) 50%, var(--navy) 66%,
+    var(--red) 66%, var(--red) 100%
   );
 }
 
-/* Classic toto card */
+/* ============================================================
+   CARDS
+   ============================================================ */
 .toto-card {
   background: #fff;
-  border: 3px solid var(--toto-green);
-  border-radius: 4px;
-  box-shadow:
-    4px 4px 0 var(--toto-green-dark),
-    inset 0 0 0 1px rgba(0, 0, 0, 0.05);
+  border: 2px solid rgba(0,90,60,0.15);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
   position: relative;
+  overflow: hidden;
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
 }
 
 .toto-card::before {
   content: "";
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 4px;
-  background: linear-gradient(90deg, var(--toto-green) 0%, var(--toto-green) 50%, var(--usa-gold) 50%, var(--usa-gold) 100%);
+  inset: 0 0 auto 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--green-600), var(--gold));
 }
 
-/* 1/X/2 bet cells - the heart of toto */
+.toto-card:hover {
+  box-shadow: var(--shadow-card-hover);
+}
+
+/* Premium hero section */
+.page-hero {
+  text-align: right;
+  padding: 1rem 0 0.5rem;
+}
+
+.hero-title {
+  font-family: "Playfair Display", serif;
+  font-size: clamp(1.75rem, 4vw, 2.5rem);
+  font-weight: 700;
+  color: var(--green-700);
+  margin: 0.25rem 0 0.1rem;
+  line-height: 1.2;
+}
+
+.hero-subtitle {
+  font-size: 0.9rem;
+  color: var(--muted);
+  margin: 0;
+  font-weight: 400;
+}
+
+/* ============================================================
+   BET CELLS — Premium version
+   ============================================================ */
 .bet-cell {
-  width: 56px;
-  height: 56px;
-  border: 2px solid var(--toto-ink);
+  width: 54px;
+  height: 54px;
+  border: 2px solid rgba(15,15,15,0.2);
   background: #fff;
   font-family: "Suez One", serif;
-  font-size: 24px;
+  font-size: 22px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition: all 0.15s cubic-bezier(0.34, 1.56, 0.64, 1);
   position: relative;
   user-select: none;
+  border-radius: 4px;
+  box-shadow: var(--shadow-sm);
 }
 
 .bet-cell:hover:not(.bet-cell-locked) {
-  background: #fffdf2;
-  transform: translateY(-1px);
-  box-shadow: 0 2px 0 var(--toto-ink);
+  background: #fffaee;
+  transform: translateY(-2px) scale(1.05);
+  border-color: var(--gold);
+  box-shadow: 0 4px 12px rgba(201,168,76,0.3);
 }
 
 .bet-cell-selected {
-  background: var(--toto-green);
-  color: var(--usa-gold);
-  border-color: var(--toto-green-dark);
+  background: linear-gradient(135deg, var(--green-600), var(--green-500));
+  color: var(--gold-bright);
+  border-color: var(--green-700);
+  box-shadow: 0 4px 12px rgba(0,90,60,0.35), inset 0 1px 0 rgba(255,255,255,0.15);
+}
+
+.bet-cell-selected::after {
+  content: "";
+  position: absolute;
+  inset: 5px;
+  background-image:
+    linear-gradient(45deg, transparent 42%, rgba(255,219,110,0.4) 42%, rgba(255,219,110,0.4) 58%, transparent 58%),
+    linear-gradient(-45deg, transparent 42%, rgba(255,219,110,0.4) 42%, rgba(255,219,110,0.4) 58%, transparent 58%);
 }
 
 .bet-cell-correct {
-  background: #c8f7c5;
-  color: var(--toto-green-dark);
-  border-color: var(--toto-green-dark);
+  background: linear-gradient(135deg, #1a7a4a, #22a060);
+  color: #fff;
+  border-color: #1a7a4a;
+  box-shadow: 0 4px 12px rgba(26,122,74,0.4);
 }
 
 .bet-cell-wrong {
-  background: #fadcdc;
-  color: var(--usa-red);
-  border-color: var(--usa-red);
+  background: linear-gradient(135deg, #c0392b, #e74c3c);
+  color: #fff;
+  border-color: #c0392b;
+  box-shadow: 0 4px 12px rgba(192,57,43,0.3);
 }
 
 .bet-cell-locked {
   cursor: not-allowed;
-  opacity: 0.95;
+  opacity: 0.8;
 }
 
-/* Stamp/ink-X selected indicator */
-.bet-cell-selected::after {
-  content: "";
-  position: absolute;
-  inset: 4px;
-  background-image:
-    linear-gradient(45deg, transparent 45%, var(--usa-gold) 45%, var(--usa-gold) 55%, transparent 55%),
-    linear-gradient(-45deg, transparent 45%, var(--usa-gold) 45%, var(--usa-gold) 55%, transparent 55%);
-  opacity: 0.35;
-}
-
-/* Header chip showing stage */
+/* ============================================================
+   STAGE CHIP
+   ============================================================ */
 .stage-chip {
-  display: inline-block;
-  padding: 4px 12px;
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 14px;
   font-family: "Bebas Neue", sans-serif;
-  font-size: 14px;
-  letter-spacing: 0.1em;
-  background: var(--toto-ink);
-  color: var(--usa-gold);
-  border: 2px solid var(--toto-ink);
-  transform: rotate(-1deg);
-  box-shadow: 2px 2px 0 var(--toto-green);
+  font-size: 13px;
+  letter-spacing: 0.12em;
+  background: var(--ink);
+  color: var(--gold-light);
+  border-radius: 100px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
 }
 
-/* Locked stamp */
+/* ============================================================
+   LOCKED STAMP
+   ============================================================ */
 .locked-stamp {
-  position: absolute;
-  top: 8px;
-  left: 8px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   font-family: "Bebas Neue", sans-serif;
-  font-size: 18px;
-  color: var(--usa-red);
-  border: 3px solid var(--usa-red);
-  padding: 4px 12px;
-  letter-spacing: 0.15em;
-  transform: rotate(-8deg);
-  opacity: 0.7;
-  pointer-events: none;
-  background: rgba(255, 255, 255, 0.6);
+  font-size: 16px;
+  color: var(--red);
+  border: 2px solid var(--red);
+  padding: 3px 12px;
+  letter-spacing: 0.12em;
+  transform: rotate(-6deg);
+  background: rgba(255,255,255,0.85);
+  border-radius: 3px;
+  box-shadow: 2px 2px 0 rgba(191,10,48,0.2);
 }
 
-/* Group letter big block */
+/* ============================================================
+   GROUP LETTER BLOCK
+   ============================================================ */
 .group-letter-block {
-  font-family: "Suez One", serif;
-  font-size: 56px;
+  font-family: "Playfair Display", serif;
+  font-size: 52px;
+  font-weight: 900;
   line-height: 1;
-  color: var(--toto-paper);
-  background: var(--toto-green);
-  padding: 12px 24px;
-  display: inline-block;
-  border: 4px solid var(--toto-ink);
-  box-shadow: 4px 4px 0 var(--usa-gold);
-  letter-spacing: 0.02em;
+  color: #fff;
+  background: linear-gradient(135deg, var(--green-700), var(--green-500));
+  padding: 14px 22px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  box-shadow: 0 4px 0 var(--green-800), 0 6px 16px rgba(0,90,60,0.3);
+  letter-spacing: -0.02em;
 }
 
-/* Reaction bubble */
+/* ============================================================
+   REACTION BUBBLE
+   ============================================================ */
 .reaction-bubble {
   background: #fff;
-  border: 2.5px solid var(--toto-ink);
-  border-radius: 14px;
-  padding: 8px 14px;
+  border: 2px solid rgba(15,15,15,0.12);
+  border-radius: 16px 16px 16px 4px;
+  padding: 10px 16px;
   position: relative;
-  font-weight: 700;
-  box-shadow: 3px 3px 0 var(--toto-ink);
-  font-size: 14px;
+  font-weight: 600;
+  font-size: 13px;
+  line-height: 1.4;
+  box-shadow: var(--shadow-md);
+  color: var(--ink-light);
 }
 
 .reaction-bubble::after {
   content: "";
   position: absolute;
-  bottom: -10px;
-  right: 24px;
+  bottom: -8px;
+  right: 20px;
   width: 0;
   height: 0;
-  border-left: 8px solid transparent;
-  border-right: 8px solid transparent;
-  border-top: 10px solid #fff;
-  filter: drop-shadow(0 2px 0 var(--toto-ink));
+  border-left: 7px solid transparent;
+  border-right: 7px solid transparent;
+  border-top: 8px solid #fff;
 }
 
-/* Button base */
+/* ============================================================
+   BUTTONS
+   ============================================================ */
 .btn {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  padding: 10px 20px;
-  font-family: "Suez One", serif;
-  font-size: 16px;
-  background: var(--toto-green);
-  color: var(--toto-paper);
-  border: 3px solid var(--toto-ink);
+  padding: 10px 22px;
+  font-family: "Heebo", sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  background: linear-gradient(135deg, var(--green-600), var(--green-500));
+  color: #fff;
+  border: none;
+  border-radius: var(--radius);
   cursor: pointer;
-  transition: transform 0.1s, box-shadow 0.1s;
-  box-shadow: 3px 3px 0 var(--toto-ink);
+  transition: all 0.15s ease;
+  box-shadow: 0 2px 0 var(--green-800), 0 4px 12px rgba(0,90,60,0.25);
+  text-decoration: none;
 }
 
 .btn:hover {
-  transform: translate(-1px, -1px);
-  box-shadow: 4px 4px 0 var(--toto-ink);
+  transform: translateY(-1px);
+  box-shadow: 0 3px 0 var(--green-800), 0 6px 16px rgba(0,90,60,0.3);
 }
 
 .btn:active {
-  transform: translate(2px, 2px);
-  box-shadow: 1px 1px 0 var(--toto-ink);
+  transform: translateY(1px);
+  box-shadow: 0 1px 0 var(--green-800);
 }
 
 .btn-secondary {
-  background: var(--toto-paper);
-  color: var(--toto-ink);
+  background: #fff;
+  color: var(--ink-light);
+  box-shadow: 0 2px 0 rgba(0,0,0,0.12), 0 2px 8px rgba(0,0,0,0.08);
+  border: 1.5px solid rgba(0,0,0,0.12);
+}
+
+.btn-secondary:hover {
+  background: var(--paper);
+  box-shadow: 0 3px 0 rgba(0,0,0,0.15), 0 4px 12px rgba(0,0,0,0.1);
 }
 
 .btn-danger {
-  background: var(--usa-red);
-  color: #fff;
+  background: linear-gradient(135deg, #c0392b, var(--red));
+  box-shadow: 0 2px 0 #8a0020, 0 4px 12px rgba(191,10,48,0.25);
+}
+
+.btn-danger:hover {
+  box-shadow: 0 3px 0 #8a0020, 0 6px 16px rgba(191,10,48,0.3);
 }
 
 .btn-gold {
-  background: var(--usa-gold);
-  color: var(--toto-ink);
+  background: linear-gradient(135deg, var(--gold-dark), var(--gold));
+  color: var(--ink);
+  box-shadow: 0 2px 0 var(--gold-dark), 0 4px 12px rgba(201,168,76,0.3);
+}
+
+.btn-gold:hover {
+  box-shadow: 0 3px 0 var(--gold-dark), 0 6px 16px rgba(201,168,76,0.4);
 }
 
 .btn:disabled {
   opacity: 0.5;
   cursor: not-allowed;
   transform: none !important;
-  box-shadow: 3px 3px 0 var(--toto-ink) !important;
 }
 
-/* Form input */
+/* ============================================================
+   FORM INPUT
+   ============================================================ */
 .input {
   width: 100%;
-  padding: 10px 12px;
-  border: 2px solid var(--toto-ink);
+  padding: 11px 14px;
+  border: 2px solid rgba(0,0,0,0.12);
   background: #fff;
   font-family: "Heebo", sans-serif;
   font-size: 16px;
-  box-shadow: inset 2px 2px 0 rgba(0, 0, 0, 0.05);
+  border-radius: var(--radius);
+  color: var(--ink);
+  transition: border-color 0.15s, box-shadow 0.15s;
+  box-shadow: var(--shadow-sm);
 }
 
 .input:focus {
   outline: none;
-  border-color: var(--toto-green);
-  box-shadow: inset 2px 2px 0 rgba(0, 90, 60, 0.1), 0 0 0 3px var(--usa-gold);
+  border-color: var(--green-500);
+  box-shadow: 0 0 0 3px rgba(0,90,60,0.12);
 }
 
-/* Scoreboard table */
+/* ============================================================
+   LEADERBOARD TABLE
+   ============================================================ */
 table.leaderboard {
   width: 100%;
   border-collapse: separate;
   border-spacing: 0;
   background: #fff;
-  border: 3px solid var(--toto-ink);
-  box-shadow: 4px 4px 0 var(--toto-green);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-lg);
 }
 
 table.leaderboard th {
-  background: var(--toto-green);
-  color: var(--usa-gold);
-  font-family: "Suez One", serif;
-  padding: 10px;
-  border-bottom: 3px solid var(--toto-ink);
+  background: linear-gradient(135deg, var(--green-700), var(--green-600));
+  color: var(--gold-light);
+  font-family: "Heebo", sans-serif;
+  font-weight: 700;
+  font-size: 13px;
+  padding: 12px 14px;
   text-align: right;
+  letter-spacing: 0.03em;
 }
 
 table.leaderboard td {
-  padding: 10px;
-  border-bottom: 1px solid #ddd;
+  padding: 12px 14px;
+  border-bottom: 1px solid rgba(0,0,0,0.06);
   font-weight: 600;
+  font-size: 14px;
 }
 
-table.leaderboard tbody tr:nth-child(odd) {
-  background: #fafaf3;
+table.leaderboard tbody tr:hover {
+  background: rgba(0,90,60,0.03);
 }
 
 table.leaderboard tbody tr:first-child td {
-  background: var(--usa-gold);
-  font-size: 18px;
+  background: linear-gradient(135deg, rgba(201,168,76,0.15), rgba(240,201,106,0.1));
+  font-size: 16px;
+  font-weight: 800;
 }
 
+table.leaderboard tbody tr:nth-child(2) td { background: rgba(200,200,200,0.06); }
+table.leaderboard tbody tr:nth-child(3) td { background: rgba(176,141,87,0.06); }
+
+/* ============================================================
+   STANDINGS TABLES
+   ============================================================ */
+.standings-card {
+  background: #fff;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+  overflow: hidden;
+  border: 1.5px solid rgba(0,90,60,0.1);
+}
+
+.standings-header {
+  background: linear-gradient(135deg, var(--green-700), var(--green-600));
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.standings-group-letter {
+  font-family: "Playfair Display", serif;
+  font-size: 36px;
+  font-weight: 900;
+  color: var(--gold-bright);
+  line-height: 1;
+  text-shadow: 0 2px 8px rgba(0,0,0,0.3);
+}
+
+.standings-group-title {
+  font-family: "Heebo", sans-serif;
+  font-weight: 700;
+  font-size: 16px;
+  color: rgba(255,255,255,0.9);
+}
+
+.standings-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.standings-th {
+  background: rgba(0,90,60,0.05);
+  padding: 8px 6px;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--muted);
+  text-align: center;
+  letter-spacing: 0.05em;
+  border-bottom: 1px solid rgba(0,0,0,0.06);
+}
+
+.standings-th.team { text-align: right; padding-right: 12px; }
+
+.standings-row {
+  border-bottom: 1px solid rgba(0,0,0,0.05);
+  transition: background 0.1s;
+}
+
+.standings-row:hover { background: rgba(0,90,60,0.03); }
+.standings-row:last-child { border-bottom: none; }
+
+.standings-row.advancing { background: rgba(0,90,60,0.04); }
+.standings-row.first { background: rgba(201,168,76,0.08); }
+
+.standings-td {
+  padding: 10px 6px;
+  font-size: 13px;
+  text-align: center;
+  font-weight: 600;
+}
+
+.standings-td.team {
+  text-align: right;
+  padding-right: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.standings-td.pts strong {
+  font-size: 15px;
+  color: var(--green-700);
+}
+
+.rank-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  background: var(--green-600);
+  color: #fff;
+  border-radius: 50%;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.rank-num {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.team-flag { font-size: 20px; }
+.team-name { font-size: 13px; font-weight: 700; color: var(--ink-light); }
+
+.standings-pending {
+  text-align: center;
+  padding: 16px;
+  font-size: 13px;
+  color: var(--muted);
+  font-style: italic;
+}
+
+/* ============================================================
+   UTILITIES
+   ============================================================ */
 @layer utilities {
-  .text-shadow-stamp {
-    text-shadow: 2px 2px 0 var(--toto-ink);
+  .text-shadow-stamp { text-shadow: 0 2px 4px rgba(0,0,0,0.3); }
+  .glass {
+    background: rgba(255,255,255,0.7);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
   }
 }
 
-/* Mobile responsive - תאי הימור קטנים יותר בפלאפון */
+/* ============================================================
+   MOBILE
+   ============================================================ */
 @media (max-width: 640px) {
   .bet-cell {
     width: 42px;
     height: 42px;
-    font-size: 20px;
+    font-size: 19px;
+  }
+
+  .group-letter-block {
+    font-size: 40px;
+    padding: 10px 16px;
   }
 }
+
+/* ============================================================
+   ANIMATIONS
+   ============================================================ */
+@keyframes stampIn {
+  0% { transform: scale(2) rotate(-15deg); opacity: 0; }
+  100% { transform: scale(1) rotate(-6deg); opacity: 1; }
+}
+
+@keyframes wobble {
+  0%, 100% { transform: rotate(0deg); }
+  25% { transform: rotate(-4deg); }
+  75% { transform: rotate(4deg); }
+}
+
+@keyframes fadeUp {
+  0% { opacity: 0; transform: translateY(10px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+
+.animate-stamp-in { animation: stampIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); }
+.animate-wobble { animation: wobble 0.5s ease-in-out; }
+.animate-fade-up { animation: fadeUp 0.4s ease-out; }
