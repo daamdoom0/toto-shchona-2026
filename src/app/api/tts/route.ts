@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 
-const audioCache = new Map<string, ArrayBuffer>();
+const audioCache = new Map<string, Uint8Array>();
 
 export async function POST(req: NextRequest) {
   try {
@@ -11,14 +11,15 @@ export async function POST(req: NextRequest) {
 
     const cacheKey = `${voiceId}:${text}`;
     if (audioCache.has(cacheKey)) {
-      return new NextResponse(audioCache.get(cacheKey), {
-        headers: { "Content-Type": "audio/mpeg" },
+      const cached = audioCache.get(cacheKey)!;
+      return new NextResponse(cached, {
+        headers: { "Content-Type": "audio/mpeg", "X-Cache": "HIT" },
       });
     }
 
     const apiKey = process.env.ELEVENLABS_API_KEY;
     if (!apiKey) {
-      return NextResponse.json({ error: "No API key" }, { status: 500 });
+      return NextResponse.json({ error: "ElevenLabs API key not configured" }, { status: 500 });
     }
 
     const response = await fetch(
@@ -43,20 +44,26 @@ export async function POST(req: NextRequest) {
     );
 
     if (!response.ok) {
-      return NextResponse.json({ error: "TTS failed" }, { status: 502 });
+      const err = await response.text();
+      console.error("ElevenLabs error:", err);
+      return NextResponse.json({ error: "TTS API failed" }, { status: 502 });
     }
 
     const arrayBuffer = await response.arrayBuffer();
-    if (audioCache.size < 200) audioCache.set(cacheKey, arrayBuffer);
+    const uint8 = new Uint8Array(arrayBuffer);
 
-    return new NextResponse(arrayBuffer, {
+    if (audioCache.size < 200) {
+      audioCache.set(cacheKey, uint8);
+    }
+
+    return new NextResponse(uint8, {
       headers: {
         "Content-Type": "audio/mpeg",
         "Cache-Control": "public, max-age=86400",
       },
     });
   } catch (err) {
-    console.error("TTS error:", err);
+    console.error("TTS route error:", err);
     return NextResponse.json({ error: "Internal error" }, { status: 500 });
   }
 }

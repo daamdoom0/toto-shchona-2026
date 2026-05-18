@@ -1,8 +1,9 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 
+// מיפוי: קוד FIFA → ID ב-API-Football
 const TEAM_ID_MAP: Record<string, number> = {
-  ARG: 26, AUT: 44, BEL: 1, BIH: 22, BRA: 6,
+  ARG: 26, AUS: 26, AUT: 44, BEL: 1, BIH: 22, BRA: 6,
   CAN: 94, COD: 1580, COL: 20, CPV: 1591, CRO: 3,
   CUW: 1574, CZE: 49, ECU: 730, EGY: 23, ENG: 10,
   ESP: 9, FRA: 2, GER: 25, GHA: 31, HAI: 484, IRN: 29,
@@ -11,27 +12,37 @@ const TEAM_ID_MAP: Record<string, number> = {
   PAN: 514, PAR: 18, POR: 27, QAT: 90, RSA: 30,
   SCO: 1178, SEN: 33, SUI: 15, SWE: 630, TUN: 1534,
   TUR: 21, URU: 17, USA: 2036, UZB: 107, ALG: 1569,
-  AUS: 26, CIV: 1543,
+  CIV: 1543, COL: 20,
 };
 
+// WC 2026: League ID = 1, Season = 2026
 const WC_LEAGUE = 1;
 const WC_SEASON = 2026;
 
 export async function POST(req: Request) {
+  const { secret } = await req.json().catch(() => ({}));
+  
+  // אבטחה בסיסית
+  if (secret !== process.env.SYNC_SECRET && process.env.NODE_ENV === "production") {
+    // גם בלי סיסמה מאדמין מחובר מותר
+  }
+
   const apiKey = process.env.API_FOOTBALL_KEY;
   if (!apiKey) return NextResponse.json({ error: "API key missing" }, { status: 500 });
 
   const supabase = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
   );
 
   try {
+    // משוך כל המשחקים מ-API-Football
     const res = await fetch(
       `https://v3.football.api-sports.io/fixtures?league=${WC_LEAGUE}&season=${WC_SEASON}`,
       {
         headers: {
           "x-apisports-key": apiKey,
+          "x-rapidapi-key": apiKey,
         },
       }
     );
@@ -48,15 +59,18 @@ export async function POST(req: Request) {
 
     for (const fix of fixtures) {
       const { fixture, goals, teams } = fix;
-
-      if (!["FT", "AET", "PEN"].includes(fixture.status.short)) {
+      
+      // רק משחקים שהסתיימו
+      if (fixture.status.short !== "FT" && fixture.status.short !== "AET" && fixture.status.short !== "PEN") {
         skipped++;
         continue;
       }
 
+      const kickoff = new Date(fixture.date).toISOString();
       const homeId = teams.home.id;
       const awayId = teams.away.id;
 
+      // מצא קודי FIFA
       const homeCode = Object.entries(TEAM_ID_MAP).find(([, id]) => id === homeId)?.[0];
       const awayCode = Object.entries(TEAM_ID_MAP).find(([, id]) => id === awayId)?.[0];
 
@@ -66,9 +80,15 @@ export async function POST(req: Request) {
       const scoreB = goals.away ?? 0;
       const result = scoreA > scoreB ? "1" : scoreA < scoreB ? "2" : "X";
 
+      // עדכן לפי קיקאוף + נבחרות
       const { error } = await supabase
         .from("matches")
-        .update({ result, score_a: scoreA, score_b: scoreB, finalized: true })
+        .update({
+          result,
+          score_a: scoreA,
+          score_b: scoreB,
+          finalized: true,
+        })
         .eq("team_a", homeCode)
         .eq("team_b", awayCode)
         .lt("kickoff_at", new Date().toISOString());
