@@ -67,7 +67,7 @@ export default function PlayerFrames() {
             left: f.x,
             top: f.y,
             transform: `rotate(${f.rotation}deg)`,
-            opacity: 0.07,
+            opacity: 0.18,
             filter: "sepia(20%)",
           }}
         >
